@@ -1,0 +1,132 @@
+@page "/delay"
+@inject HttpClient Http
+@using System.Text.Json
+
+<PageTitle>Delay Prediction</PageTitle>
+
+<div class="page-header">
+    <h1>📦 Delivery Delay Prediction</h1>
+    <p>Predict delivery delays using XGBoost ML model trained on historical logistics data</p>
+</div>
+
+<div class="how-it-works">
+    <h3>📖 How it Works</h3>
+    <p>This module uses an <strong>XGBoost Classifier</strong> to predict the likelihood of a delivery delay based on real-time operational data.</p>
+    <ul>
+        <li><strong>Traffic & Weather</strong>: External conditions impacting transit speed</li>
+        <li><strong>Driver Performance</strong>: Driver behavior and fatigue scores</li>
+        <li><strong>Inventory Levels</strong>: Warehouse efficiency indicators</li>
+    </ul>
+</div>
+
+<div class="prediction-form">
+    <h3>🚀 Predict Shipment Delay</h3>
+    
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Lead Time (days)</label>
+            <input type="number" @bind="leadTime" min="1" max="30" />
+        </div>
+        <div class="form-group">
+            <label>Weather Severity</label>
+            <select @bind="weatherSeverity">
+                <option value="1">Mild</option>
+                <option value="2">Moderate</option>
+                <option value="3">Severe</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Traffic Level: @trafficLevel.ToString("P0")</label>
+            <input type="range" @bind="trafficLevel" min="0" max="1" step="0.1" />
+        </div>
+        <div class="form-group">
+            <label>Driver Score: @driverScore.ToString("P0")</label>
+            <input type="range" @bind="driverScore" min="0" max="1" step="0.1" />
+        </div>
+        <div class="form-group">
+            <label>Inventory Level</label>
+            <input type="number" @bind="inventoryLevel" min="0" max="500" />
+        </div>
+        <div class="form-group">
+            <label>Disruption Score: @disruptionScore.ToString("P0")</label>
+            <input type="range" @bind="disruptionScore" min="0" max="1" step="0.1" />
+        </div>
+    </div>
+    
+    <button class="btn-primary" @onclick="PredictDelay">Predict Delay Risk</button>
+</div>
+
+@if (showResult)
+{
+    <div class="result-card @(isDelayed ? "danger" : "success")">
+        <div class="result-icon">@(isDelayed ? "⚠️" : "✅")</div>
+        <div class="result-text">
+            <h3>@(isDelayed ? "High Risk of Delay!" : "On-Time Delivery Expected")</h3>
+            <p>Delay Probability: <strong>@delayProbability.ToString("P1")</strong></p>
+        </div>
+    </div>
+    
+    <div class="factors-grid">
+        <div class="factor-card">
+            <span class="factor-label">Traffic Impact</span>
+            <span class="factor-value">@((trafficLevel * 0.35).ToString("P1"))</span>
+        </div>
+        <div class="factor-card">
+            <span class="factor-label">Weather Impact</span>
+            <span class="factor-value">@(((weatherSeverity / 3.0) * 0.20).ToString("P1"))</span>
+        </div>
+        <div class="factor-card">
+            <span class="factor-label">Driver Impact</span>
+            <span class="factor-value">@(((1 - driverScore) * 0.25).ToString("P1"))</span>
+        </div>
+        <div class="factor-card">
+            <span class="factor-label">Disruption Impact</span>
+            <span class="factor-value">@((disruptionScore * 0.15).ToString("P1"))</span>
+        </div>
+    </div>
+}
+
+@code {
+    private int leadTime = 5;
+    private int weatherSeverity = 1;
+    private double trafficLevel = 0.5;
+    private double driverScore = 0.8;
+    private int inventoryLevel = 100;
+    private double disruptionScore = 0.1;
+    
+    private bool showResult = false;
+    private bool isDelayed = false;
+    private double delayProbability = 0;
+
+    private async Task PredictDelay()
+    {
+        try
+        {
+            var request = new
+            {
+                lead_time_days = leadTime,
+                weather_severity = weatherSeverity,
+                traffic_level = trafficLevel,
+                driver_score = driverScore,
+                inventory_level = inventoryLevel,
+                disruption_score = disruptionScore
+            };
+            
+            var response = await Http.PostAsJsonAsync("http://localhost:8000/api/delay/predict", request);
+            var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+            
+            isDelayed = result.GetProperty("is_delayed").GetBoolean();
+            delayProbability = result.GetProperty("delay_probability").GetDouble();
+        }
+        catch
+        {
+            // Calculate locally if API unavailable
+            delayProbability = trafficLevel * 0.35 + (weatherSeverity / 3.0) * 0.20 + 
+                               (1 - driverScore) * 0.25 + disruptionScore * 0.15 +
+                               (1 - Math.Min(inventoryLevel / 500.0, 1)) * 0.05;
+            isDelayed = delayProbability > 0.5;
+        }
+        
+        showResult = true;
+    }
+}

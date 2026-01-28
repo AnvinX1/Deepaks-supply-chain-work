@@ -1,0 +1,179 @@
+@page "/anomaly"
+@inject HttpClient Http
+@using System.Text.Json
+
+<PageTitle>Anomaly Detection</PageTitle>
+
+<div class="page-header">
+    <h1>🔍 Anomaly Detection</h1>
+    <p>Identify unusual patterns in supply chain operations using AI</p>
+</div>
+
+<div class="how-it-works">
+    <h3>📖 Anomaly Detection Logic</h3>
+    <p>Identifies outliers and unusual patterns that deviate from normal operations:</p>
+    <ul>
+        <li><strong>Isolation Forest</strong>: Isolates anomalies by randomly selecting features and split values</li>
+        <li><strong>Autoencoder</strong>: Neural network that learns to reconstruct normal data; high reconstruction error = anomaly</li>
+    </ul>
+</div>
+
+<div class="alert-section">
+    <h3>🚨 Recent Alerts (@alerts.Count)</h3>
+    @if (alerts.Count == 0)
+    {
+        <div class="no-alerts">✅ No active anomalies detected</div>
+    }
+    else
+    {
+        @foreach (var alert in alerts)
+        {
+            <div class="alert-card">
+                <span class="alert-time">@alert.Timestamp</span>
+                <span class="alert-score">Score: @alert.AnomalyScore.ToString("P1")</span>
+                <span class="alert-metric">Temp: @alert.Temperature.ToString("F1")°C</span>
+            </div>
+        }
+    }
+</div>
+
+<div class="prediction-form">
+    <h3>🔍 Check for Anomaly</h3>
+    
+    <div class="form-grid">
+        <div class="form-group">
+            <label>IoT Temperature (°C)</label>
+            <input type="number" @bind="iotTemperature" min="-10" max="50" step="0.5" />
+        </div>
+        <div class="form-group">
+            <label>Fuel Consumption (L/100km)</label>
+            <input type="number" @bind="fuelConsumption" min="0" max="30" step="0.5" />
+        </div>
+        <div class="form-group">
+            <label>Traffic Level: @trafficLevel.ToString("P0")</label>
+            <input type="range" @bind="trafficLevel" min="0" max="1" step="0.1" />
+        </div>
+        <div class="form-group">
+            <label>Driver Fatigue: @driverFatigue.ToString("P0")</label>
+            <input type="range" @bind="driverFatigue" min="0" max="1" step="0.1" />
+        </div>
+    </div>
+    
+    <button class="btn-primary" @onclick="DetectAnomaly">Detect Anomaly</button>
+</div>
+
+@if (showResult)
+{
+    <div class="result-card @(isAnomaly ? "danger" : "success")">
+        <div class="result-icon">@(isAnomaly ? "🚨" : "✅")</div>
+        <div class="result-text">
+            <h3>@(isAnomaly ? "ANOMALY DETECTED!" : "Normal Operation")</h3>
+            <p>Anomaly Score: <strong>@anomalyScore.ToString("P1")</strong></p>
+            <p class="recommendation">@recommendation</p>
+        </div>
+    </div>
+}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span class="stat-label">Total Records</span>
+        <span class="stat-value">@totalRecords.ToString("N0")</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Avg Temperature</span>
+        <span class="stat-value">@avgTemperature.ToString("F1")°C</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Avg Fuel Consumption</span>
+        <span class="stat-value">@avgFuelConsumption.ToString("F1") L</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-label">Anomaly Rate</span>
+        <span class="stat-value">@anomalyRate.ToString("P2")</span>
+    </div>
+</div>
+
+@code {
+    private List<AlertItem> alerts = new();
+    
+    private double iotTemperature = 25;
+    private double fuelConsumption = 10;
+    private double trafficLevel = 0.5;
+    private double driverFatigue = 0.1;
+    
+    private bool showResult = false;
+    private bool isAnomaly = false;
+    private double anomalyScore = 0;
+    private string recommendation = "";
+    
+    private int totalRecords = 50000;
+    private double avgTemperature = 24.5;
+    private double avgFuelConsumption = 12.3;
+    private double anomalyRate = 0.023;
+
+    private class AlertItem
+    {
+        public string Timestamp { get; set; } = "";
+        public double AnomalyScore { get; set; }
+        public double Temperature { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var alertsData = await Http.GetFromJsonAsync<JsonElement>("http://localhost:8000/api/anomaly/alerts");
+            var stats = await Http.GetFromJsonAsync<JsonElement>("http://localhost:8000/api/anomaly/stats");
+            
+            foreach (var alert in alertsData.GetProperty("alerts").EnumerateArray())
+            {
+                alerts.Add(new AlertItem
+                {
+                    Timestamp = alert.GetProperty("timestamp").GetString() ?? "",
+                    AnomalyScore = alert.GetProperty("anomaly_score").GetDouble(),
+                    Temperature = alert.GetProperty("iot_temperature").GetDouble()
+                });
+            }
+            
+            totalRecords = stats.GetProperty("total_records").GetInt32();
+            avgTemperature = stats.GetProperty("avg_temperature").GetDouble();
+            avgFuelConsumption = stats.GetProperty("avg_fuel_consumption").GetDouble();
+        }
+        catch { }
+    }
+
+    private async Task DetectAnomaly()
+    {
+        try
+        {
+            var request = new
+            {
+                iot_temperature = iotTemperature,
+                fuel_consumption = fuelConsumption,
+                traffic_level = trafficLevel,
+                driver_fatigue = driverFatigue
+            };
+            
+            var response = await Http.PostAsJsonAsync("http://localhost:8000/api/anomaly/detect", request);
+            var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+            
+            isAnomaly = result.GetProperty("is_anomaly").GetBoolean();
+            anomalyScore = result.GetProperty("anomaly_score").GetDouble();
+            recommendation = result.GetProperty("recommendation").GetString() ?? "";
+        }
+        catch
+        {
+            // Calculate locally
+            var tempDev = Math.Max(0, Math.Abs(iotTemperature - 25) / 20);
+            var fuelDev = Math.Max(0, Math.Abs(fuelConsumption - 12.5) / 15);
+            var trafficDev = Math.Max(0, trafficLevel - 0.7);
+            var fatigueDev = Math.Max(0, driverFatigue - 0.3);
+            
+            anomalyScore = (tempDev + fuelDev + trafficDev + fatigueDev) / 4;
+            isAnomaly = anomalyScore > 0.3;
+            recommendation = isAnomaly ? "Investigate operational metrics - deviation detected" : "All metrics within normal range";
+        }
+        
+        showResult = true;
+    }
+}

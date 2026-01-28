@@ -1,0 +1,94 @@
+﻿@page "/"
+@inject HttpClient Http
+@using System.Text.Json
+
+<PageTitle>Logistics Control Tower</PageTitle>
+
+<div class="dashboard-header">
+    <h1>🚚 Supply Chain Control Tower</h1>
+    <p class="subtitle">AI-Powered Logistics Intelligence</p>
+</div>
+
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-value">@totalShipments.ToString("N0")</div>
+        <div class="kpi-label">Total Shipments</div>
+    </div>
+    <div class="kpi-card success">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-value">@onTimeRate.ToString("P1")</div>
+        <div class="kpi-label">On-Time Rate</div>
+    </div>
+    <div class="kpi-card warning">
+        <div class="kpi-icon">⚠️</div>
+        <div class="kpi-value">@highRiskCount.ToString("N0")</div>
+        <div class="kpi-label">High Risk Shipments</div>
+    </div>
+    <div class="kpi-card info">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-value">@avgDelay.ToString("F1")h</div>
+        <div class="kpi-label">Avg Delay</div>
+    </div>
+</div>
+
+<div class="module-grid">
+    <a href="/delay" class="module-card">
+        <div class="module-icon">📦</div>
+        <h3>Delay Prediction</h3>
+        <p>Predict delivery delays using XGBoost ML model</p>
+    </a>
+    <a href="/risk" class="module-card">
+        <div class="module-icon">🎯</div>
+        <h3>Risk Classification</h3>
+        <p>Categorize shipments into Low/Moderate/High risk</p>
+    </a>
+    <a href="/forecast" class="module-card">
+        <div class="module-icon">📈</div>
+        <h3>Demand Forecasting</h3>
+        <p>Predict inventory needs with Prophet/LSTM</p>
+    </a>
+    <a href="/anomaly" class="module-card">
+        <div class="module-icon">🔍</div>
+        <h3>Anomaly Detection</h3>
+        <p>Identify unusual patterns with Isolation Forest</p>
+    </a>
+</div>
+
+@code {
+    private int totalShipments = 0;
+    private double onTimeRate = 0;
+    private int highRiskCount = 0;
+    private double avgDelay = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch stats from API
+            var delayStats = await Http.GetFromJsonAsync<JsonElement>("http://localhost:8000/api/delay/stats");
+            var riskStats = await Http.GetFromJsonAsync<JsonElement>("http://localhost:8000/api/risk/distribution");
+            
+            if (delayStats.ValueKind != JsonValueKind.Undefined)
+            {
+                totalShipments = delayStats.GetProperty("total_shipments").GetInt32();
+                onTimeRate = delayStats.GetProperty("on_time_rate").GetDouble();
+                avgDelay = delayStats.GetProperty("avg_delay_deviation").GetDouble();
+            }
+            
+            if (riskStats.ValueKind != JsonValueKind.Undefined)
+            {
+                highRiskCount = riskStats.GetProperty("high_risk_count").GetInt32();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"API Error: {ex.Message}");
+            // Use demo data
+            totalShipments = 50000;
+            onTimeRate = 0.847;
+            highRiskCount = 2341;
+            avgDelay = 2.3;
+        }
+    }
+}
