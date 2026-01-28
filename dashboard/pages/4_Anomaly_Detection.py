@@ -4,6 +4,7 @@ Anomaly Detection Dashboard Module
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import sys
 from pathlib import Path
@@ -18,21 +19,22 @@ from dashboard.utils.data_loader import load_model, load_main_dataset
 def show():
     st.title("🔍 Anomaly Detection")
     
-    st.markdown(\"\"\"
+    st.markdown("""
     ### 📖 Anomaly Detection Logic
     Identifies outliers and unusual patterns in the supply chain that deviate from the norm.
     
     **Algorithms Used:**
     - **Isolation Forest**: Isolates anomalies by randomly selecting a feature and split value.
     - **Autoencoder**: Neural network that learns to reconstruct normal data; high reconstruction error = anomaly.
-    \"\"\")
+    """)
     
     df = load_main_dataset()
+    if df is None:
+        st.error("Data not found")
+        return
     
     # Mock anomaly scores for visualization if model not loaded
-    # In prod: scores = model.score_samples(df)
     if 'anomaly_score' not in df.columns:
-        import numpy as np
         df['anomaly_score'] = np.random.uniform(0, 1, len(df))
         df['is_anomaly'] = df['anomaly_score'] > 0.95
         
@@ -62,7 +64,7 @@ def show():
             title="Real-time Anomaly Scoring"
         )
         fig.add_hline(y=0.95, line_dash="dot", annotation_text="Threshold")
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(fig, use_container_width=True)
         
     with col2:
         st.subheader("Stats")
@@ -79,7 +81,7 @@ def show():
     
     fig2 = px.box(df, x='is_anomaly', y=selected_metric, color='is_anomaly', 
                   title=f"{selected_metric} Distribution (Normal vs Anomaly)")
-    st.plotly_chart(fig2, width="stretch")
+    st.plotly_chart(fig2, use_container_width=True)
 
 if __name__ == "__main__":
     show()

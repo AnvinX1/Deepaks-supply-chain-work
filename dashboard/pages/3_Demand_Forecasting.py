@@ -20,6 +20,9 @@ def show():
     st.title("📈 Demand Forecasting")
     
     df = load_main_dataset()
+    if df is None:
+        st.error("Data not found")
+        return
     
     # Filter controls
     col1, col2 = st.columns(2)
@@ -28,16 +31,14 @@ def show():
     with col2:
         model_type = st.selectbox("Model", ["Prophet", "LSTM"])
         
-    st.markdown(\"\"\"
+    st.markdown("""
     ### 📖 Forecasting Engine
     Predicts future inventory levels to optimize stock management.
     - **Prophet**: Additive model ideal for daily seasonality (Facebook).
     - **LSTM**: Deep Learning model capturing complex non-linear temporal dependencies.
-    \"\"\")
+    """)
     
-    # Generate Mock Forecast (since we can't run the full model inference in real-time easily without tensor setup issues in streamlit sometimes)
-    # In a real app, we would call the actual model.predict()
-    
+    # Generate Mock Forecast
     last_date = pd.to_datetime(df['timestamp']).max()
     future_dates = pd.date_range(start=last_date, periods=forecast_horizon + 1, freq='h')[1:]
     
@@ -46,7 +47,7 @@ def show():
     std = df['warehouse_inventory_level'].std()
     
     forecast_values = np.random.normal(historical_mean, std * 0.1, size=len(future_dates))
-    forecast_values = pd.Series(forecast_values).rolling(window=5, min_periods=1).mean().values # Smooth it
+    forecast_values = pd.Series(forecast_values).rolling(window=5, min_periods=1).mean().values
     
     # Confidence intervals
     lower_bound = forecast_values - (std * 0.2)
@@ -92,7 +93,7 @@ def show():
         height=500
     )
     
-    st.plotly_chart(fig, width="stretch")
+    st.plotly_chart(fig, use_container_width=True)
     
     # Data Table
     st.subheader("Forecast Data")

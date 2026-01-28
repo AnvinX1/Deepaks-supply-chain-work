@@ -33,7 +33,7 @@ def show():
     col2.metric("High Risk Shipments", f"{high_risk:,}", delta_color="inverse")
     col3.metric("Risk Rate", f"{risk_rate:.1%}")
     
-    st.markdown(\"\"\"
+    st.markdown("""
     ### 📖 Module Explanation
     This module performs **Multi-Class Risk Classification** to categorize shipments into:
     - 🟢 **Low Risk**: Smooth operations expected.
@@ -41,7 +41,7 @@ def show():
     - 🔴 **High Risk**: High probability of severe delay or issues.
     
     **AI Model**: It uses an XGBoost classifier trained on historical disruption data, analyzing factors like route risk, weather, and supplier reliability.
-    \"\"\")
+    """)
     
     # Visualizations
     st.subheader("Risk Distribution")
@@ -49,13 +49,13 @@ def show():
     c1, c2 = st.columns([2, 1])
     
     with c1:
-        # Sunburst chart
+        # Sunburst chart using columns that exist
         fig = px.sunburst(
             df, 
             path=['risk_classification', 'order_fulfillment_status'], 
             title="Risk Breakdown by Order Status"
         )
-        st.plotly_chart(fig, width="stretch")
+        st.plotly_chart(fig, use_container_width=True)
         
     with c2:
         # Risk factors
@@ -68,9 +68,12 @@ def show():
         
         st.info("💡 High risk is primarily driven by external disruption events and route risk levels.")
 
-    st.subheader("Geospacial Risk Map")
-    if 'latitude' in df.columns and 'longitude' in df.columns:
-        st.map(df)
+    st.subheader("Geospatial Risk Map")
+    if 'vehicle_gps_latitude' in df.columns and 'vehicle_gps_longitude' in df.columns:
+        map_df = df[['vehicle_gps_latitude', 'vehicle_gps_longitude']].rename(
+            columns={'vehicle_gps_latitude': 'latitude', 'vehicle_gps_longitude': 'longitude'}
+        ).dropna()
+        st.map(map_df.head(1000))
     else:
         st.warning("Geospatial data not available for map visualization.")
 
