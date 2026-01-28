@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.env
+.venv
+
+# Models (ignore large model files but keep small ones if needed)
+# Allowing pickle files for this demo as they are needed for the dashboard
+# *.pkl
+# *.h5
+
+# Logs
+logs/
+*.log
+
+# IDEs
+.idea/
+.vscode/
+*.swp

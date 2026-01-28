@@ -1,0 +1,48 @@
+# Configuration for Anomaly Detection
+
+data:
+  path: "../data/dynamic_supply_chain_logistics_dataset.csv"
+  
+features:
+  sensor:
+    - iot_temperature
+    - fuel_consumption_rate
+  operational:
+    - traffic_congestion_level
+    - port_congestion_level
+    - loading_unloading_time
+    - customs_clearance_time
+  behavioral:
+    - driver_behavior_score
+    - fatigue_monitoring_score
+
+models:
+  isolation_forest:
+    n_estimators: 100
+    contamination: 0.05
+    max_samples: auto
+    random_state: 42
+    
+  autoencoder:
+    encoding_dim: 8
+    hidden_layers: [32, 16]
+    epochs: 50
+    batch_size: 32
+    threshold_percentile: 95
+    
+  statistical:
+    z_score_threshold: 3.0
+    iqr_multiplier: 1.5
+
+alerting:
+  severity_thresholds:
+    critical: 0.9
+    warning: 0.7
+    info: 0.5
+  log_file: "logs/alerts.log"
+
+output:
+  model_dir: "models/"
+  isolation_forest_model: "isolation_forest.pkl"
+  autoencoder_model: "autoencoder.h5"
+  plots_dir: "models/plots/"

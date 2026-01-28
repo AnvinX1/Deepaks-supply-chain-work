@@ -1,0 +1,72 @@
+# Configuration for Risk Classification Model
+
+data:
+  path: "../data/dynamic_supply_chain_logistics_dataset.csv"
+  test_size: 0.2
+  random_state: 42
+  target_column: risk_classification
+  
+features:
+  numerical:
+    - fuel_consumption_rate
+    - eta_variation_hours
+    - traffic_congestion_level
+    - warehouse_inventory_level
+    - loading_unloading_time
+    - handling_equipment_availability
+    - weather_condition_severity
+    - port_congestion_level
+    - shipping_costs
+    - supplier_reliability_score
+    - lead_time_days
+    - iot_temperature
+    - route_risk_level
+    - customs_clearance_time
+    - driver_behavior_score
+    - fatigue_monitoring_score
+    - disruption_likelihood_score
+    - delay_probability
+    
+  categorical:
+    - cargo_condition_status
+    
+  temporal:
+    - timestamp
+
+class_mapping:
+  "Low Risk": 0
+  "Moderate Risk": 1
+  "High Risk": 2
+  
+class_weights:
+  balanced: true
+
+model:
+  name: xgboost
+  params:
+    n_estimators: 150
+    max_depth: 8
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+    objective: multi:softprob
+    num_class: 3
+    eval_metric: mlogloss
+
+training:
+  cross_validation:
+    enabled: true
+    n_folds: 5
+    stratified: true
+  early_stopping:
+    enabled: true
+    rounds: 15
+  class_balancing:
+    method: smote  # Options: smote, class_weight, none
+
+output:
+  model_dir: "models/"
+  model_file: "risk_classifier.pkl"
+  metrics_file: "models/metrics.json"
+  shap_plots_dir: "models/shap_plots/"

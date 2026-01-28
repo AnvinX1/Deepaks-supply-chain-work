@@ -1,0 +1,56 @@
+# Configuration for Demand Forecasting
+
+data:
+  path: "../data/dynamic_supply_chain_logistics_dataset.csv"
+  target_columns:
+    - warehouse_inventory_level
+    - historical_demand
+  datetime_column: timestamp
+  test_size: 0.2
+  random_state: 42
+
+features:
+  lag_values: [1, 6, 12, 24]
+  rolling_windows: [6, 12, 24]
+  rolling_stats: [mean, std, min, max]
+  
+  external_features:
+    - weather_condition_severity
+    - traffic_congestion_level
+    - shipping_costs
+    - port_congestion_level
+
+models:
+  lstm:
+    lookback: 24
+    forecast_horizon: 24
+    units: 64
+    dropout: 0.2
+    epochs: 50
+    batch_size: 32
+    learning_rate: 0.001
+    
+  prophet:
+    yearly_seasonality: false
+    weekly_seasonality: true
+    daily_seasonality: true
+    changepoint_prior_scale: 0.05
+    
+  lightgbm:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.1
+    random_state: 42
+
+training:
+  validation_split: 0.15
+  early_stopping:
+    patience: 10
+    min_delta: 0.001
+
+output:
+  model_dir: "models/"
+  lstm_model: "lstm_forecaster.h5"
+  prophet_model: "prophet_model.pkl"
+  lgbm_model: "lgbm_forecaster.pkl"
+  plots_dir: "models/plots/"
