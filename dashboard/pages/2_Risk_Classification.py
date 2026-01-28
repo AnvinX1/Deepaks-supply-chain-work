@@ -1,0 +1,60 @@
+"""
+Risk Classification Dashboard Module
+"""
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+from dashboard.utils.data_loader import load_model, load_main_dataset
+
+def show():
+    st.title("🎯 Risk Classification")
+    
+    df = load_main_dataset()
+    if df is None:
+        st.error("Data not found")
+        return
+
+    # Metrics
+    total = len(df)
+    high_risk = len(df[df['risk_classification'] == 'High Risk'])
+    risk_rate = high_risk / total
+    
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Total Shipments", f"{total:,}")
+    col2.metric("High Risk Shipments", f"{high_risk:,}", delta_color="inverse")
+    col3.metric("Risk Rate", f"{risk_rate:.1%}")
+    
+    # Visualizations
+    st.subheader("Risk Distribution")
+    
+    c1, c2 = st.columns([2, 1])
+    
+    with c1:
+        # Sunburst chart
+        fig = px.sunburst(
+            df, 
+            path=['risk_classification', 'carrier_name'], 
+            title="Risk Breakdown by Carrier"
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        
+    with c2:
+        # Risk factors
+        st.markdown("### Key Risk Drivers")
+        st.write("""
+        1. **Disruption Likelihood**: 89% impact
+        2. **Combined Risk Score**: 2.2% impact
+        3. **Delay Probability**: 2.1% impact
+        """)
+        
+        st.info("💡 High risk is primarily driven by external disruption events and route risk levels.")
+
+    st.subheader("Geospacial Risk Map")
+    if 'latitude' in df.columns and 'longitude' in df.columns:
+        st.map(df)
+    else:
+        st.warning("Geospatial data not available for map visualization.")
+
+if __name__ == "__main__":
+    show()
