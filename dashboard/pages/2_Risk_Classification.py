@@ -42,10 +42,10 @@ def show():
         # Sunburst chart
         fig = px.sunburst(
             df, 
-            path=['risk_classification', 'carrier_name'], 
-            title="Risk Breakdown by Carrier"
+            path=['risk_classification', 'vehicle_type'], 
+            title="Risk Breakdown by Vehicle Type"
         )
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
     with c2:
         # Risk factors

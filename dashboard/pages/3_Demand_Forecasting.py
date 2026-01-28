@@ -85,7 +85,7 @@ def show():
         height=500
     )
     
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
     
     # Data Table
     st.subheader("Forecast Data")
@@ -95,7 +95,7 @@ def show():
         "Lower Bound": lower_bound.round(0),
         "Upper Bound": upper_bound.round(0)
     })
-    st.dataframe(forecast_df.head(24), use_container_width=True)
+    st.dataframe(forecast_df.head(24), width=None)
 
 if __name__ == "__main__":
     show()

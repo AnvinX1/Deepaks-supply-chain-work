@@ -23,7 +23,11 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from project_1_delivery_delay_prediction.src.features.feature_engineering import create_features
+try:
+    from project_1_delivery_delay_prediction.src.features.feature_engineering import create_features
+except ImportError:
+    # Fallback or simple mock if import fails in some environments
+    create_features = None
 
 def show():
     st.title("📦 Delivery Delay Prediction")
@@ -105,16 +109,16 @@ def show():
         
         # Interactive Plot
         fig = px.histogram(df, x="delivery_delay", color="vehicle_type", title="Delay Distribution by Vehicle Type")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
         col1, col2 = st.columns(2)
         with col1:
              fig2 = px.scatter(df, x="distance_km", y="delivery_delay", color="weather_condition_severity", title="Distance vs Delay")
-             st.plotly_chart(fig2, use_container_width=True)
+             st.plotly_chart(fig2, width="stretch")
         
         with col2:
              fig3 = px.box(df, x="carrier_name", y="delivery_delay", title="Carrier Performance")
-             st.plotly_chart(fig3, use_container_width=True)
+             st.plotly_chart(fig3, width="stretch")
 
 if __name__ == "__main__":
     show()

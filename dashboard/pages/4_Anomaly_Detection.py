@@ -53,7 +53,7 @@ def show():
             title="Real-time Anomaly Scoring"
         )
         fig.add_hline(y=0.95, line_dash="dot", annotation_text="Threshold")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         
     with col2:
         st.subheader("Stats")
@@ -70,7 +70,7 @@ def show():
     
     fig2 = px.box(df, x='is_anomaly', y=selected_metric, color='is_anomaly', 
                   title=f"{selected_metric} Distribution (Normal vs Anomaly)")
-    st.plotly_chart(fig2, use_container_width=True)
+    st.plotly_chart(fig2, width="stretch")
 
 if __name__ == "__main__":
     show()
