@@ -44,26 +44,37 @@ def show():
     tab1, tab2 = st.tabs(["🚀 Real-time Prediction", "📊 Historical Analysis"])
     
     with tab1:
+        st.markdown(\"\"\"
+        ### 📖 How it Works
+        This module uses an **XGBoost Classifier** to predict the likelihood of a delivery delay based on real-time operational data.
+        
+        **Key Factors Analyzed:**
+        - **Traffic & Weather**: External conditions impacting transit speed.
+        - **Driver & Vehicle**: Operational performance metrics.
+        - **Inventory & Handling**: Warehouse efficiency indicators.
+        \"\"\")
+        
         st.markdown("### Predict Shipment Delay")
         
         col1, col2 = st.columns(2)
         with col1:
             distance = st.number_input("Distance (km)", min_value=0, value=500)
-            weather = st.selectbox("Weather Severity", [0, 1, 2, 3], format_func=lambda x: ["Clear", "Rain", "Storm", "Severe"][x])
+            weather = st.selectbox("Weather Severity", [1, 2, 3], format_func=lambda x: ["Mild", "Moderate", "Severe"][x-1])
             traffic = st.slider("Traffic Level", 0.0, 1.0, 0.5)
             
         with col2:
-            vehicle_type = st.selectbox("Vehicle Type", ["Truck", "Ship", "Plane"])
+            # vehicle_type missing, using order_status as proxy for modality logic demo
+            order_status = st.selectbox("Order Status", ["On Time", "Delayed", "Completed"]) 
             driver_score = st.slider("Driver Score", 0.0, 1.0, 0.8)
             inventory = st.number_input("Inventory Level", min_value=0, value=100)
 
         if st.button("Predict Delay Risk"):
             # Create a mock dataframe for prediction
             input_data = pd.DataFrame({
-                'distance_km': [distance],
+                'lead_time_days': [distance/100], # Proxy
                 'weather_condition_severity': [weather],
                 'traffic_congestion_level': [traffic],
-                'vehicle_type': [vehicle_type],
+                'order_fulfillment_status': [order_status],
                 'driver_behavior_score': [driver_score],
                 'warehouse_inventory_level': [inventory],
                 # Add dummy values for other required features
@@ -108,16 +119,16 @@ def show():
         st.markdown("### Historical Delay Analysis")
         
         # Interactive Plot
-        fig = px.histogram(df, x="delivery_delay", color="vehicle_type", title="Delay Distribution by Vehicle Type")
+        fig = px.histogram(df, x="delivery_time_deviation", color="risk_classification", title="Delay Deviation by Risk Class")
         st.plotly_chart(fig, width="stretch")
         
         col1, col2 = st.columns(2)
         with col1:
-             fig2 = px.scatter(df, x="distance_km", y="delivery_delay", color="weather_condition_severity", title="Distance vs Delay")
+             fig2 = px.scatter(df, x="lead_time_days", y="delivery_time_deviation", color="weather_condition_severity", title="Lead Time vs Delay")
              st.plotly_chart(fig2, width="stretch")
         
         with col2:
-             fig3 = px.box(df, x="carrier_name", y="delivery_delay", title="Carrier Performance")
+             fig3 = px.box(df, x="order_fulfillment_status", y="delivery_time_deviation", title="Order Status Performance") # Changed carrier_name to order_fulfillment_status
              st.plotly_chart(fig3, width="stretch")
 
 if __name__ == "__main__":

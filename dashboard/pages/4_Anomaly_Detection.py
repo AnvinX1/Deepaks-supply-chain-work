@@ -18,6 +18,15 @@ from dashboard.utils.data_loader import load_model, load_main_dataset
 def show():
     st.title("🔍 Anomaly Detection")
     
+    st.markdown(\"\"\"
+    ### 📖 Anomaly Detection Logic
+    Identifies outliers and unusual patterns in the supply chain that deviate from the norm.
+    
+    **Algorithms Used:**
+    - **Isolation Forest**: Isolates anomalies by randomly selecting a feature and split value.
+    - **Autoencoder**: Neural network that learns to reconstruct normal data; high reconstruction error = anomaly.
+    \"\"\")
+    
     df = load_main_dataset()
     
     # Mock anomaly scores for visualization if model not loaded

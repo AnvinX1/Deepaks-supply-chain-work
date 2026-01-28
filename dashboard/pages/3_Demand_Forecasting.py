@@ -28,6 +28,13 @@ def show():
     with col2:
         model_type = st.selectbox("Model", ["Prophet", "LSTM"])
         
+    st.markdown(\"\"\"
+    ### 📖 Forecasting Engine
+    Predicts future inventory levels to optimize stock management.
+    - **Prophet**: Additive model ideal for daily seasonality (Facebook).
+    - **LSTM**: Deep Learning model capturing complex non-linear temporal dependencies.
+    \"\"\")
+    
     # Generate Mock Forecast (since we can't run the full model inference in real-time easily without tensor setup issues in streamlit sometimes)
     # In a real app, we would call the actual model.predict()
     
@@ -95,7 +102,7 @@ def show():
         "Lower Bound": lower_bound.round(0),
         "Upper Bound": upper_bound.round(0)
     })
-    st.dataframe(forecast_df.head(24), width=None)
+    st.dataframe(forecast_df.head(24), use_container_width=True)
 
 if __name__ == "__main__":
     show()

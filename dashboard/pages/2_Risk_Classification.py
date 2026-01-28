@@ -33,6 +33,16 @@ def show():
     col2.metric("High Risk Shipments", f"{high_risk:,}", delta_color="inverse")
     col3.metric("Risk Rate", f"{risk_rate:.1%}")
     
+    st.markdown(\"\"\"
+    ### 📖 Module Explanation
+    This module performs **Multi-Class Risk Classification** to categorize shipments into:
+    - 🟢 **Low Risk**: Smooth operations expected.
+    - 🟡 **Moderate Risk**: Potential minor disruptions.
+    - 🔴 **High Risk**: High probability of severe delay or issues.
+    
+    **AI Model**: It uses an XGBoost classifier trained on historical disruption data, analyzing factors like route risk, weather, and supplier reliability.
+    \"\"\")
+    
     # Visualizations
     st.subheader("Risk Distribution")
     
@@ -42,8 +52,8 @@ def show():
         # Sunburst chart
         fig = px.sunburst(
             df, 
-            path=['risk_classification', 'vehicle_type'], 
-            title="Risk Breakdown by Vehicle Type"
+            path=['risk_classification', 'order_fulfillment_status'], 
+            title="Risk Breakdown by Order Status"
         )
         st.plotly_chart(fig, width="stretch")
         
