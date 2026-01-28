@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply Chain Control Tower | AI-Powered Logistics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">🚚</span>
+            <span class="logo-text">Logistics AI</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">🏠</span>
+                <span>Dashboard</span>
+            </li>
+            <li class="nav-item" data-page="delay">
+                <span class="nav-icon">📦</span>
+                <span>Delay Prediction</span>
+            </li>
+            <li class="nav-item" data-page="risk">
+                <span class="nav-icon">🎯</span>
+                <span>Risk Classification</span>
+            </li>
+            <li class="nav-item" data-page="forecast">
+                <span class="nav-icon">📈</span>
+                <span>Demand Forecasting</span>
+            </li>
+            <li class="nav-item" data-page="anomaly">
+                <span class="nav-icon">🔍</span>
+                <span>Anomaly Detection</span>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="status-indicator">
+                <span class="status-dot"></span>
+                <span>API Connected</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <div id="page-dashboard" class="page active">
+            <header class="page-header">
+                <div class="header-content">
+                    <h1>Supply Chain Control Tower</h1>
+                    <p>AI-Powered Real-Time Logistics Intelligence</p>
+                </div>
+                <div class="header-actions">
+                    <span class="live-indicator">
+                        <span class="pulse"></span>
+                        Live
+                    </span>
+                </div>
+            </header>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon blue">📦</div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" id="kpi-shipments">32,065</span>
+                        <span class="kpi-label">Total Shipments</span>
+                    </div>
+                    <div class="kpi-trend up">+12.5%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon green">✅</div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" id="kpi-ontime">84.7%</span>
+                        <span class="kpi-label">On-Time Rate</span>
+                    </div>
+                    <div class="kpi-trend up">+2.3%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon red">⚠️</div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" id="kpi-highrisk">2,341</span>
+                        <span class="kpi-label">High Risk</span>
+                    </div>
+                    <div class="kpi-trend down">-5.1%</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon purple">⏱️</div>
+                    <div class="kpi-content">
+                        <span class="kpi-value" id="kpi-delay">2.3h</span>
+                        <span class="kpi-label">Avg Delay</span>
+                    </div>
+                    <div class="kpi-trend up">+0.2h</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>Risk Distribution</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>Delay Trend (7 Days)</h3>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="delayTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-grid">
+                <div class="module-card" data-page="delay">
+                    <div class="module-icon">📦</div>
+                    <div class="module-content">
+                        <h4>Delay Prediction</h4>
+                        <p>XGBoost ML model for real-time delay risk scoring</p>
+                    </div>
+                    <span class="module-arrow">→</span>
+                </div>
+                <div class="module-card" data-page="risk">
+                    <div class="module-icon">🎯</div>
+                    <div class="module-content">
+                        <h4>Risk Classification</h4>
+                        <p>Multi-class classification: Low, Moderate, High</p>
+                    </div>
+                    <span class="module-arrow">→</span>
+                </div>
+                <div class="module-card" data-page="forecast">
+                    <div class="module-icon">📈</div>
+                    <div class="module-content">
+                        <h4>Demand Forecasting</h4>
+                        <p>Prophet & LSTM time series prediction</p>
+                    </div>
+                    <span class="module-arrow">→</span>
+                </div>
+                <div class="module-card" data-page="anomaly">
+                    <div class="module-icon">🔍</div>
+                    <div class="module-content">
+                        <h4>Anomaly Detection</h4>
+                        <p>Isolation Forest outlier identification</p>
+                    </div>
+                    <span class="module-arrow">→</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delay Prediction Page -->
+        <div id="page-delay" class="page">
+            <header class="page-header">
+                <div class="header-content">
+                    <h1>📦 Delivery Delay Prediction</h1>
+                    <p>Predict delivery delays using XGBoost ML model</p>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <h3>📖 How it Works</h3>
+                <p>This module uses an <strong>XGBoost Classifier</strong> trained on historical logistics data to predict delivery delay probability.</p>
+                <div class="info-list">
+                    <span class="info-item">🚦 Traffic & Weather Impact</span>
+                    <span class="info-item">👤 Driver Performance</span>
+                    <span class="info-item">📊 Inventory Levels</span>
+                </div>
+            </div>
+
+            <div class="card form-card">
+                <div class="card-header">
+                    <h3>🚀 Predict Shipment Delay</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Lead Time (days)</label>
+                            <input type="number" id="delay-leadtime" value="5" min="1" max="30">
+                        </div>
+                        <div class="form-group">
+                            <label>Weather Severity</label>
+                            <select id="delay-weather">
+                                <option value="1">🌤️ Mild</option>
+                                <option value="2">🌧️ Moderate</option>
+                                <option value="3">⛈️ Severe</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Traffic Level: <span id="traffic-val">50%</span></label>
+                            <input type="range" id="delay-traffic" value="0.5" min="0" max="1" step="0.05">
+                        </div>
+                        <div class="form-group">
+                            <label>Driver Score: <span id="driver-val">80%</span></label>
+                            <input type="range" id="delay-driver" value="0.8" min="0" max="1" step="0.05">
+                        </div>
+                        <div class="form-group">
+                            <label>Inventory Level</label>
+                            <input type="number" id="delay-inventory" value="100" min="0" max="500">
+                        </div>
+                        <div class="form-group">
+                            <label>Disruption Score: <span id="disruption-val">10%</span></label>
+                            <input type="range" id="delay-disruption" value="0.1" min="0" max="1" step="0.05">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="predictDelay()">
+                        <span class="btn-icon">🔮</span>
+                        Predict Delay Risk
+                    </button>
+                </div>
+            </div>
+
+            <div id="delay-result" class="result-card hidden">
+                <div class="result-icon" id="delay-result-icon">✅</div>
+                <div class="result-content">
+                    <h3 id="delay-result-title">On-Time Delivery Expected</h3>
+                    <p id="delay-result-text">Delay Probability: <strong>25%</strong></p>
+                </div>
+                <div class="result-gauge">
+                    <div class="gauge-fill" id="delay-gauge"></div>
+                </div>
+            </div>
+
+            <div id="delay-factors" class="factors-grid hidden">
+                <div class="factor-card">
+                    <span class="factor-label">Traffic Impact</span>
+                    <span class="factor-value" id="factor-traffic">17.5%</span>
+                </div>
+                <div class="factor-card">
+                    <span class="factor-label">Weather Impact</span>
+                    <span class="factor-value" id="factor-weather">6.7%</span>
+                </div>
+                <div class="factor-card">
+                    <span class="factor-label">Driver Impact</span>
+                    <span class="factor-value" id="factor-driver">5.0%</span>
+                </div>
+                <div class="factor-card">
+                    <span class="factor-label">Disruption Impact</span>
+                    <span class="factor-value" id="factor-disruption">1.5%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Classification Page -->
+        <div id="page-risk" class="page">
+            <header class="page-header">
+                <div class="header-content">
+                    <h1>🎯 Risk Classification</h1>
+                    <p>Categorize shipments into Low/Moderate/High risk</p>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <h3>📖 Module Explanation</h3>
+                <p>Multi-class risk classification using <strong>XGBoost</strong> to categorize shipments:</p>
+                <div class="risk-labels">
+                    <span class="risk-badge low">🟢 Low Risk</span>
+                    <span class="risk-badge moderate">🟡 Moderate Risk</span>
+                    <span class="risk-badge high">🔴 High Risk</span>
+                </div>
+            </div>
+
+            <div class="kpi-grid small">
+                <div class="kpi-card mini">
+                    <span class="kpi-value" id="risk-total">32,065</span>
+                    <span class="kpi-label">Total</span>
+                </div>
+                <div class="kpi-card mini danger">
+                    <span class="kpi-value" id="risk-high">2,341</span>
+                    <span class="kpi-label">High Risk</span>
+                </div>
+                <div class="kpi-card mini warning">
+                    <span class="kpi-value" id="risk-moderate">15,234</span>
+                    <span class="kpi-label">Moderate</span>
+                </div>
+                <div class="kpi-card mini success">
+                    <span class="kpi-value" id="risk-low">14,490</span>
+                    <span class="kpi-label">Low Risk</span>
+                </div>
+            </div>
+
+            <div class="card form-card">
+                <div class="card-header">
+                    <h3>🎯 Classify New Shipment</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Route Risk: <span id="route-val">30%</span></label>
+                            <input type="range" id="risk-route" value="0.3" min="0" max="1" step="0.05">
+                        </div>
+                        <div class="form-group">
+                            <label>Supplier Reliability: <span id="supplier-val">80%</span></label>
+                            <input type="range" id="risk-supplier" value="0.8" min="0" max="1" step="0.05">
+                        </div>
+                        <div class="form-group">
+                            <label>Disruption Likelihood: <span id="disrupt-val">20%</span></label>
+                            <input type="range" id="risk-disruption" value="0.2" min="0" max="1" step="0.05">
+                        </div>
+                        <div class="form-group">
+                            <label>Delay Probability: <span id="delayprob-val">30%</span></label>
+                            <input type="range" id="risk-delay" value="0.3" min="0" max="1" step="0.05">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="classifyRisk()">
+                        <span class="btn-icon">🎯</span>
+                        Classify Risk
+                    </button>
+                </div>
+            </div>
+
+            <div id="risk-result" class="result-card hidden">
+                <div class="result-icon large" id="risk-result-icon">🟢</div>
+                <div class="result-content">
+                    <h3 id="risk-result-class">Low Risk</h3>
+                    <p id="risk-result-confidence">Confidence: <strong>85%</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forecasting Page -->
+        <div id="page-forecast" class="page">
+            <header class="page-header">
+                <div class="header-content">
+                    <h1>📈 Demand Forecasting</h1>
+                    <p>Predict future inventory needs with Prophet/LSTM</p>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <h3>📖 Forecasting Engine</h3>
+                <p>Time series forecasting for warehouse inventory optimization:</p>
+                <div class="info-list">
+                    <span class="info-item">📊 Prophet - Facebook's additive model</span>
+                    <span class="info-item">🧠 LSTM - Deep Learning temporal model</span>
+                </div>
+            </div>
+
+            <div class="card form-card">
+                <div class="card-header">
+                    <h3>⚙️ Forecast Settings</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid compact">
+                        <div class="form-group">
+                            <label>Forecast Horizon: <span id="horizon-val">48</span> hours</label>
+                            <input type="range" id="forecast-horizon" value="48" min="24" max="168" step="24">
+                        </div>
+                        <div class="form-group">
+                            <label>Model</label>
+                            <select id="forecast-model">
+                                <option value="prophet">Prophet</option>
+                                <option value="lstm">LSTM</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="generateForecast()">
+                        <span class="btn-icon">📈</span>
+                        Generate Forecast
+                    </button>
+                </div>
+            </div>
+
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>Inventory Forecast</h3>
+                    <span class="chart-legend">
+                        <span class="legend-item"><span class="legend-dot blue"></span> Historical</span>
+                        <span class="legend-item"><span class="legend-dot purple"></span> Forecast</span>
+                    </span>
+                </div>
+                <div class="card-body">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anomaly Detection Page -->
+        <div id="page-anomaly" class="page">
+            <header class="page-header">
+                <div class="header-content">
+                    <h1>🔍 Anomaly Detection</h1>
+                    <p>Identify unusual patterns with Isolation Forest</p>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <h3>📖 Detection Algorithms</h3>
+                <p>Identifies outliers and unusual operational patterns:</p>
+                <div class="info-list">
+                    <span class="info-item">🌲 Isolation Forest</span>
+                    <span class="info-item">🔄 Autoencoder Neural Network</span>
+                </div>
+            </div>
+
+            <div class="card alert-card">
+                <div class="card-header">
+                    <h3>🚨 Recent Alerts</h3>
+                    <span class="alert-count" id="alert-count">5</span>
+                </div>
+                <div class="card-body">
+                    <div class="alert-list" id="alert-list">
+                        <!-- Alerts populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="card form-card">
+                <div class="card-header">
+                    <h3>🔍 Check for Anomaly</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>IoT Temperature (°C)</label>
+                            <input type="number" id="anomaly-temp" value="25" min="-10" max="50" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Fuel Consumption (L/100km)</label>
+                            <input type="number" id="anomaly-fuel" value="10" min="0" max="30" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label>Traffic Level: <span id="anom-traffic-val">50%</span></label>
+                            <input type="range" id="anomaly-traffic" value="0.5" min="0" max="1" step="0.05">
+                        </div>
+                        <div class="form-group">
+                            <label>Driver Fatigue: <span id="fatigue-val">10%</span></label>
+                            <input type="range" id="anomaly-fatigue" value="0.1" min="0" max="1" step="0.05">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="detectAnomaly()">
+                        <span class="btn-icon">🔍</span>
+                        Detect Anomaly
+                    </button>
+                </div>
+            </div>
+
+            <div id="anomaly-result" class="result-card hidden">
+                <div class="result-icon" id="anomaly-result-icon">✅</div>
+                <div class="result-content">
+                    <h3 id="anomaly-result-title">Normal Operation</h3>
+                    <p id="anomaly-result-text">Anomaly Score: <strong>8%</strong></p>
+                    <p class="result-recommendation" id="anomaly-recommendation">All metrics within normal range</p>
+                </div>
+            </div>
+
+            <div class="kpi-grid small">
+                <div class="kpi-card mini">
+                    <span class="kpi-value" id="anom-total">32,065</span>
+                    <span class="kpi-label">Records</span>
+                </div>
+                <div class="kpi-card mini">
+                    <span class="kpi-value" id="anom-temp-avg">24.5°C</span>
+                    <span class="kpi-label">Avg Temp</span>
+                </div>
+                <div class="kpi-card mini">
+                    <span class="kpi-value" id="anom-fuel-avg">12.3L</span>
+                    <span class="kpi-label">Avg Fuel</span>
+                </div>
+                <div class="kpi-card mini danger">
+                    <span class="kpi-value" id="anom-rate">2.3%</span>
+                    <span class="kpi-label">Anomaly Rate</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

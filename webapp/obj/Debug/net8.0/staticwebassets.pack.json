@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "/home/specter/Videos/deepak-files/supply_chain_ml_projects/webapp/obj/Debug/net8.0/scopedcss/projectbundle/LogisticsDashboard.bundle.scp.css",
+      "PackagePath": "staticwebassets/LogisticsDashboard.bundle.scp.css"
+    },
+    {
+      "Id": "/home/specter/Videos/deepak-files/supply_chain_ml_projects/webapp/wwwroot/app.css",
+      "PackagePath": "staticwebassets/app.css"
+    },
+    {
+      "Id": "/home/specter/Videos/deepak-files/supply_chain_ml_projects/webapp/wwwroot/bootstrap/bootstrap.min.css",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css"
+    },
+    {
+      "Id": "/home/specter/Videos/deepak-files/supply_chain_ml_projects/webapp/wwwroot/bootstrap/bootstrap.min.css.map",
+      "PackagePath": "staticwebassets/bootstrap/bootstrap.min.css.map"
+    },
+    {
+      "Id": "/home/specter/Videos/deepak-files/supply_chain_ml_projects/webapp/wwwroot/css/app.css",
+      "PackagePath": "staticwebassets/css/app.css"
+    },
+    {
+      "Id": "/home/specter/Videos/deepak-files/supply_chain_ml_projects/webapp/wwwroot/favicon.png",
+      "PackagePath": "staticwebassets/favicon.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.LogisticsDashboard.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.LogisticsDashboard.props",
+      "PackagePath": "build\\LogisticsDashboard.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.LogisticsDashboard.props",
+      "PackagePath": "buildMultiTargeting\\LogisticsDashboard.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.LogisticsDashboard.props",
+      "PackagePath": "buildTransitive\\LogisticsDashboard.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
