@@ -5,6 +5,14 @@ Risk Classification Dashboard Module
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import sys
+from pathlib import Path
+
+# Add project root to path
+PROJECT_ROOT = Path(__file__).parent.parent.parent.absolute()
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.append(str(PROJECT_ROOT))
+
 from dashboard.utils.data_loader import load_model, load_main_dataset
 
 def show():
